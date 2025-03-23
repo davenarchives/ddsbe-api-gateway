@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use GuzzleHttp\Exception\ClientException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -86,18 +87,18 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($exception->getMessage(), Response::HTTP_UNAUTHORIZED);
         }
 
+        // Guzzle HTTP Client Exception
         if ($exception instanceof ClientException) {
-            $message = $exception->getResponse()->getBody();
-            $code = $exception->getCode();
-            
-            return $this->errorMessage($message,200);
-            }
+            $message = (string) $exception->getResponse()->getBody();
+            $decoded = json_decode($message, true);
+            $msg = $decoded['error'] ?? $message;
+            return $this->errorResponse($msg, $exception->getCode() ?: 400);
+        }
 
-        // If running in development, show the full error
+        // If in debug mode, show the full error
         if (env('APP_DEBUG', false)) {
             return parent::render($request, $exception);
         }
-
 
         // Generic Internal Server Error
         return $this->errorResponse('Unexpected error. Try again later.', Response::HTTP_INTERNAL_SERVER_ERROR);

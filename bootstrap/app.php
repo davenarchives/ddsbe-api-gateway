@@ -36,6 +36,7 @@ $app->withEloquent();
 */
 $app->configure('app');
 $app->configure('services');
+$app->configure('auth');
 
 /*
 |--------------------------------------------------------------------------
@@ -67,15 +68,16 @@ $app->singleton(
 | route or middleware that'll be assigned to some specific routes.
 |
 */
-//$app->middleware([
-//    App\Http\Middleware\AuthenticateAccess::class
-//]);
+// Temporarily disable global middleware (ExampleMiddleware) to bypass potential API key checks
+// $app->middleware([
+//     App\Http\Middleware\ExampleMiddleware::class
+// ]);
 
+// Temporarily disable route middleware (auth and client.credentials) to bypass authentication
 $app->routeMiddleware([
-   'auth' => App\Http\Middleware\Authenticate::class,
-   'client_credentials' => Laravel\Passport\Http\Middleware\CheckClientCredentials::class
+    // 'auth' => App\Http\Middleware\Authenticate::class,
+    // 'client.credentials' => Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
 ]);
-
 
 /*
 |--------------------------------------------------------------------------
@@ -87,13 +89,12 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
-$app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\EventServiceProvider::class);
-
+// $app->register(App\Providers\AppServiceProvider::class);
+// Temporarily disable Passport to bypass OAuth checks
 $app->register(App\Providers\AuthServiceProvider::class);
-
-$app->register(Laravel\Passport\PassportServiceProvider::class);
-$app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
+// $app->register(Laravel\Passport\PassportServiceProvider::class);
+// $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
+// $app->register(App\Providers\EventServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
